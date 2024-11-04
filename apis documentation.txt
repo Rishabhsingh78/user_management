@@ -1,0 +1,154 @@
+Prerequisites
+
+
+
+
+Python 3.7+
+FastAPI and Uvicorn for API framework
+Firestore as the database
+FastAPI-Mail for sending emails
+dotenv for environment variable management
+Install Required Packages
+Install the necessary dependencies from requirements.txt (if created) or individually:
+
+bash
+Copy code
+pip install fastapi "uvicorn[standard]" google-cloud-firestore pydantic fastapi-mail python-dotenv
+Environment Configuration
+Set up a .env file in the project root with the following values:
+
+plaintext
+Copy code
+GOOGLE_APPLICATION_CREDENTIALS=<path_to_google_application_credentials>
+MAIL_USERNAME=<your_email_username>
+MAIL_PASSWORD=<your_email_password>
+MAIL_FROM=<your_email>
+Project Structure
+app.py: Main application code for the FastAPI service
+.env: Environment file containing sensitive data
+API Endpoints
+1. Add User
+URL: /add_users
+Method: POST
+Description: Adds a new user to Firestore.
+Request Body:
+json
+Copy code
+{
+  "username": "string",
+  "email": "string",
+  "project_id": "string"
+}
+Response:
+json
+Copy code
+{
+  "username": "string",
+  "email": "string",
+  "project_id": "string",
+  "user_id": "auto-generated id"
+}
+2. Get All Users
+URL: /get_users
+Method: GET
+Description: Retrieves all users from Firestore.
+Response:
+json
+Copy code
+{
+  "users": [
+    {
+      "username": "string",
+      "email": "string",
+      "project_id": "string",
+      "user_id": "string"
+    },
+    ...
+  ]
+}
+3. Update User
+URL: /update_users
+Method: PATCH
+Description: Updates an existing user's information in Firestore.
+Parameters:
+user_id (query parameter, str): The unique ID of the user to update.
+Request Body:
+json
+Copy code
+{
+  "username": "string (optional)",
+  "email": "string (optional)",
+  "project_id": "string (optional)"
+}
+Response:
+json
+Copy code
+{
+  "status": "User updated successfully"
+}
+4. Delete User
+URL: /delete_users
+Method: DELETE
+Description: Deletes a user from Firestore.
+Parameters:
+user_id (query parameter, str): The unique ID of the user to delete.
+Response:
+json
+Copy code
+{
+  "status": "User deleted successfully"
+}
+5. Send Invite
+URL: /send_invite
+Method: GET
+Description: Sends an invitation email with API documentation to a list of predefined recipients.
+Response:
+json
+Copy code
+{
+  "status": "Invitation sent successfully"
+}
+6. Documentation Links
+Custom Docs:
+URL: /docs
+Method: GET
+Description: Redirects to Swagger UI documentation.
+Custom ReDoc:
+URL: /redoc
+Method: GET
+Description: Redirects to ReDoc API documentation.
+Configuration
+Firestore Initialization
+Firestore is initialized using credentials specified in the .env file:
+
+python
+Copy code
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+db = firestore.Client()
+Email Configuration
+Set up email credentials in .env and configure them in ConnectionConfig:
+
+python
+Copy code
+conf = ConnectionConfig(
+    MAIL_USERNAME=os.getenv("MAIL_USERNAME"),
+    MAIL_PASSWORD=os.getenv("MAIL_PASSWORD"),
+    MAIL_FROM=os.getenv("MAIL_FROM"),
+    MAIL_PORT=587,
+    MAIL_SERVER="smtp.gmail.com",
+    MAIL_STARTTLS=False,
+    MAIL_SSL_TLS=True,
+    USE_CREDENTIALS=True,
+    VALIDATE_CERTS=True
+)
+Running the Application
+Start the server: Run the application with Uvicorn:
+bash
+Copy code
+uvicorn app:app --reload
+Access the API Documentation:
+Swagger UI: http://127.0.0.1:8000/docs
+ReDoc: http://127.0.0.1:8000/redoc
+Notes
+Ensure Firestore and email credentials are correctly configured.
+Customize recipient emails in send_invite if needed
